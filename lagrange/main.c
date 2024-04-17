@@ -1,67 +1,38 @@
+/* ESTE CÓDIGO FOI REALIZADO PELO GRUPO:
+   Anna Júlia Pereira de Oliveira Andrade, RA: 234659
+   Kaique Vecchia Alves, RA: 235446
+   Nathalia Atamanchuk Baleeiro, RA: 235215
+
+    <- DESCRIÇÃO ->
+    O código foi desenvolvido para calcular a interpolação de Newton através da Forma de Lagrange,
+    onde o usuário insere o grau do polinômio e os pontos, tão como um valor de X, e então o programa
+    calcula e exibe os valores Lk(x) enquanto o usuário desejar.
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-
-void aloca(int ponto, double **x, double **y);
-double lagrange(int ponto, double *x, double *y, double xi);
+#include "calculation.h"
+#include "display.h"
+#include "allocation.h"
 
 int main(void) {
-    int grau, ponto;
-    double *x = NULL, *y = NULL, xi, lk;
+    data_static_t data_static;
+    data_vector_t *data_vector = NULL;
     char answer;
 
-    printf("Insira o grau da funcao: ");
-    scanf("%d", &grau);
-    ponto = grau + 1;
-
-    aloca(ponto, &x, &y);
-    printf("Digite os valores de x e de f(x):\n");
-    for (int i = 0; i < ponto; i++) {
-        printf("x[%d] = ", i);
-        scanf(" %lf", x + i);
-        printf("f(x[%d]) = ", i);
-        scanf(" %lf", y + i);
-    }
-
     do {
-        printf("\n\nDigite o valor de x para interpolacao: ");
-        scanf(" %lf", &xi);
-
-        lk = lagrange(ponto, x, y, xi);
-        printf("\n\nP(%.2f) = %.3lf\n", xi, lk);
+        display_read_degree(&data_static);
+        aloca_struct(&data_vector, data_static.ponto);
+        display_read_values(&data_static, data_vector);
+        display_want_to_continue(&data_static, data_vector);
 
         printf("\nDeseja calcular outro valor (S/N)? ");
         scanf(" %c", &answer);
         system("cls");
-
-    } while (tolower(answer) == 's');
-
-    free(x);
-    free(y);
+    }while (tolower(answer) == 's');
 
     return 0;
 }
 
-void aloca(int ponto, double **x, double **y) {
-    *x = (double *)malloc(ponto * sizeof(double));
-    *y = (double *)malloc(ponto * sizeof(double));
-    if (!(*x) || !(*y)) {
-        perror("Erro ao alocar memória");
-        exit(EXIT_FAILURE);
-    }
-}
 
-double lagrange(int ponto, double *x, double *y, double xi) {
-    double resultado = 0;
-    for (int i = 0; i < ponto; i++) {
-        double termo = 1;
-        for (int j = 0; j < ponto; j++) {
-            if (j != i) {
-                termo *= (xi - *(x + j)) / (*(x + i) - *(x + j));
-                printf("L[%i]= %.3lf\n", j, termo);
-            }
-        }
-        resultado += (*(y + i) * termo);
-    }
-    return resultado;
-}
